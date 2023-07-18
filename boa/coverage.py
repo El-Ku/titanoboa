@@ -188,7 +188,7 @@ class TitanoboaReporter(coverage.plugin.FileReporter):
         c = self._compiler_data
 
         # source_map should really be in CompilerData
-        _, source_map = compile_ir.assembly_to_evm(c.assembly_runtime)
+        _, source_map, _ = compile_ir.assembly_to_evm(c.assembly_runtime)
 
         for _, v in source_map["pc_pos_map"].items():
             if v is None:

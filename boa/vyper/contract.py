@@ -25,6 +25,7 @@ from vyper.codegen.global_context import GlobalContext
 from vyper.codegen.ir_node import IRnode
 from vyper.codegen.module import generate_ir_for_module
 from vyper.compiler import output as compiler_output
+from vyper.compiler.settings import OptimizationLevel
 from vyper.exceptions import VyperException
 from vyper.ir.optimizer import optimize
 from vyper.semantics.analysis.data_positions import set_data_positions
@@ -575,7 +576,7 @@ class VyperContract(_BaseContract):
     @property
     def source_map(self):
         if self._source_map is None:
-            _, self._source_map = compile_ir.assembly_to_evm(
+            _, self._source_map, _ = compile_ir.assembly_to_evm(
                 self.compiler_data.assembly_runtime
             )
         return self._source_map
@@ -756,7 +757,7 @@ class VyperContract(_BaseContract):
     @cached_property
     def unoptimized_assembly(self):
         runtime = self.compiler_data.ir_runtime
-        return compile_ir.compile_to_assembly(runtime, no_optimize=True)
+        return compile_ir.compile_to_assembly(runtime, optimize=OptimizationLevel.NONE)
 
     @cached_property
     def data_section_size(self):
@@ -772,7 +773,7 @@ class VyperContract(_BaseContract):
 
     @cached_property
     def unoptimized_bytecode(self):
-        s, _ = compile_ir.assembly_to_evm(
+        s, _, _ = compile_ir.assembly_to_evm(
             self.unoptimized_assembly, insert_vyper_signature=True
         )
         return s + self.data_section
@@ -875,7 +876,7 @@ class VyperFunction:
 
     @cached_property
     def bytecode(self):
-        bytecode, _ = compile_ir.assembly_to_evm(self.assembly)
+        bytecode, _, _ = compile_ir.assembly_to_evm(self.assembly)
         return bytecode
 
     # hotspot, cache the signature computation
